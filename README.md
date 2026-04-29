@@ -293,8 +293,12 @@ README.md
 
 ## 许可证
 
-本项目使用 MIT License 发布，详见 [LICENSE](LICENSE)。
+本项目使用 GNU Affero General Public License v3.0 only 发布，详见 [LICENSE](LICENSE)。
 
-MIT 是一个宽松的开源许可证，允许他人使用、复制、修改、分发本扩展，也允许二次开发和再发布。使用者需要保留原始版权声明和许可证文本。
+SPDX 标识：`AGPL-3.0-only`
+
+AGPL-3.0 不是“禁止商用”许可证。它允许使用、复制、修改和分发，但要求下游在发布修改版、分发修改版，或通过网络向用户提供修改版服务时，继续以 AGPL-3.0 方式开放对应源代码。
+
+换句话说：可以使用和二次开发，但不适合把修改后的版本闭源发布。
 
 SillyTavern 本体遵循其自身许可证。本扩展是独立前端扩展，不修改 SillyTavern 核心文件。
