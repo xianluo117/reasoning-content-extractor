@@ -1,0 +1,66 @@
+<div id="rce_settings" class="extension_container">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b>推理内容提取器</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content">
+            <label class="checkbox_label" for="rce_enabled">
+                <input id="rce_enabled" type="checkbox" />
+                <span>启用</span>
+            </label>
+
+            <label class="checkbox_label" for="rce_only_empty">
+                <input id="rce_only_empty" type="checkbox" />
+                <span>仅修复可见正文为空的消息</span>
+            </label>
+
+            <label class="checkbox_label" for="rce_remove_block">
+                <input id="rce_remove_block" type="checkbox" />
+                <span>从推理块中移除已提取片段</span>
+            </label>
+
+            <label class="checkbox_label" for="rce_keep_wrapper">
+                <input id="rce_keep_wrapper" type="checkbox" />
+                <span>提取到正文时保留外层标签</span>
+            </label>
+
+            <label class="checkbox_label" for="rce_emit_update">
+                <input id="rce_emit_update" type="checkbox" />
+                <span>修复后发送 MESSAGE_UPDATED 事件</span>
+            </label>
+
+            <label for="rce_mode">提取模式</label>
+            <select id="rce_mode" class="text_pole">
+                <option value="tag">标签名</option>
+                <option value="regex">自定义正则</option>
+            </select>
+
+            <div id="rce_tag_settings">
+                <label for="rce_tag_name">标签名</label>
+                <input id="rce_tag_name" class="text_pole" type="text" placeholder="content" />
+            </div>
+
+            <div id="rce_regex_settings">
+                <label for="rce_regex">自定义正则</label>
+                <textarea id="rce_regex" class="text_pole textarea_compact" rows="3" placeholder="<content\\b[^>]*>([\\s\\S]*?)<\\/content>"></textarea>
+                <label for="rce_regex_flags">正则标志</label>
+                <input id="rce_regex_flags" class="text_pole" type="text" placeholder="i" />
+                <small>优先使用第一个捕获组作为提取内容；如果没有捕获组，则使用完整匹配。</small>
+            </div>
+
+            <div class="flex-container flexGap5 rce_controls">
+                <div id="rce_repair_latest" class="menu_button menu_button_icon">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>修复最新消息</span>
+                </div>
+                <div id="rce_repair_chat" class="menu_button menu_button_icon">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                    <span>修复当前聊天</span>
+                </div>
+            </div>
+
+            <small id="rce_status"></small>
+        </div>
+    </div>
+</div>
