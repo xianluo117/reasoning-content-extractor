@@ -55,7 +55,7 @@ SillyTavern/public/scripts/extensions/third-party/reasoning-content-extractor
 
 ## 快速开始
 
-默认设置已经改为适合 `</think>` 结构的正则提取模式。
+默认设置已经改为适合 `</think>` / `</thinking>` 结构的正则提取模式。
 
 只要 AI 消息满足以下条件，扩展就会自动修复：
 
