@@ -1,0 +1,18 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+
+#rce_settings .inline-drawer-content {
+    gap: 0.5rem;
+}
+
+#rce_settings label {
+    margin-top: 0.35rem;
+}
+
+#rce_regex_settings small,
+#rce_status {
+    opacity: 0.8;
+}
+
+.rce_controls {
+    margin-top: 0.5rem;
+}
