@@ -63,6 +63,37 @@ function isBlankVisibleMessage(message) {
     return text === '' || text === '...';
 }
 
+function getTagNames(value) {
+    const source = String(value ?? '').trim() || defaultSettings.tagName;
+    const seen = new Set();
+    const tagNames = [];
+    const invalidTagNames = [];
+
+    for (const part of source.split(/[\n,，]+/)) {
+        const tagName = part.trim();
+        if (!tagName) {
+            continue;
+        }
+
+        if (!/^[A-Za-z][A-Za-z0-9:_-]*$/.test(tagName)) {
+            invalidTagNames.push(tagName);
+            continue;
+        }
+
+        const key = tagName.toLowerCase();
+        if (!seen.has(key)) {
+            seen.add(key);
+            tagNames.push(tagName);
+        }
+    }
+
+    if (invalidTagNames.length > 0) {
+        console.warn('[Reasoning Content Extractor] Ignoring invalid tag names:', invalidTagNames);
+    }
+
+    return tagNames;
+}
+
 function buildExtractor(settings) {
     if (settings.mode === 'regex') {
         const pattern = String(settings.regex ?? '').trim();
@@ -71,21 +102,61 @@ function buildExtractor(settings) {
         }
 
         try {
-            return new RegExp(pattern, String(settings.regexFlags ?? ''));
+            return {
+                regex: new RegExp(pattern, String(settings.regexFlags ?? '')),
+                contentGroup: 1,
+            };
         } catch (error) {
             console.warn('[Reasoning Content Extractor] Invalid custom regex.', error);
             return null;
         }
     }
 
-    const tagName = String(settings.tagName || defaultSettings.tagName).trim();
-    if (!/^[A-Za-z][A-Za-z0-9:_-]*$/.test(tagName)) {
-        console.warn('[Reasoning Content Extractor] Invalid tag name:', tagName);
+    const tagNames = getTagNames(settings.tagName);
+    if (!tagNames.length) {
+        console.warn('[Reasoning Content Extractor] No valid tag names configured.');
         return null;
     }
 
-    const escapedTagName = escapeRegex(tagName);
-    return new RegExp(`<\\s*${escapedTagName}\\b[^>]*>([\\s\\S]*?)<\\s*\\/\\s*${escapedTagName}\\s*>`, 'i');
+    const escapedTagNames = tagNames.map(escapeRegex).join('|');
+    return {
+        regex: new RegExp(`<\\s*(${escapedTagNames})\\b[^>]*>([\\s\\S]*?)<\\s*\\/\\s*\\1\\s*>`, 'gi'),
+        contentGroup: 2,
+    };
+}
+
+function collectMatches(reasoning, extractor) {
+    const matches = [];
+    extractor.regex.lastIndex = 0;
+
+    if (!extractor.regex.global) {
+        const match = extractor.regex.exec(reasoning);
+        return match ? [match] : [];
+    }
+
+    let match;
+    while ((match = extractor.regex.exec(reasoning)) !== null) {
+        matches.push(match);
+
+        if (match[0] === '') {
+            extractor.regex.lastIndex++;
+        }
+    }
+
+    return matches;
+}
+
+function removeMatches(reasoning, matches) {
+    let cursor = 0;
+    let remaining = '';
+
+    for (const match of matches) {
+        remaining += reasoning.slice(cursor, match.index);
+        cursor = match.index + match[0].length;
+    }
+
+    remaining += reasoning.slice(cursor);
+    return remaining.trim();
 }
 
 function extractFromReasoning(reasoning, settings) {
@@ -94,21 +165,24 @@ function extractFromReasoning(reasoning, settings) {
         return null;
     }
 
-    const match = extractor.exec(reasoning);
-    if (!match) {
+    const matches = collectMatches(reasoning, extractor);
+    if (!matches.length) {
         return null;
     }
 
-    const extracted = String(settings.keepWrapper ? match[0] : (match[1] ?? match[0] ?? '')).trim();
-    if (!extracted) {
+    const extractedParts = matches
+        .map(match => String(settings.keepWrapper ? match[0] : (match[extractor.contentGroup] ?? match[0] ?? '')).trim())
+        .filter(Boolean);
+
+    if (!extractedParts.length) {
         return null;
     }
 
     const remaining = settings.removeExtractedBlock
-        ? `${reasoning.slice(0, match.index)}${reasoning.slice(match.index + match[0].length)}`.trim()
+        ? removeMatches(reasoning, matches)
         : reasoning;
 
-    return { extracted, remaining };
+    return { extracted: extractedParts.join('\n\n'), remaining };
 }
 
 function hasRenderedMessage(messageId) {

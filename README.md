@@ -27,7 +27,7 @@
 - 默认保留外层 `<content>...</content>` 标签。
 - 可选只提取标签内部文本。
 - 可选从推理块中移除已提取片段，避免上下文重复。
-- 支持自定义标签名，例如 `context`、`response`、`final`。
+- 支持自定义一个或多个标签名，例如 `context`、`response`、`final`。
 - 支持自定义正则表达式。
 - 提供“修复最新消息”和“修复当前聊天”的手动按钮。
 
@@ -60,7 +60,7 @@ SillyTavern/public/scripts/extensions/third-party/reasoning-content-extractor
 
 - 消息来自 AI，不是用户消息或系统消息。
 - 可见正文为空、空白，或只有 `...`。
-- 推理块中存在完整且非空的 `<content>...</content>`。
+- 推理块中存在完整且非空的已配置标签，例如 `<content>...</content>`。
 
 默认修复前：
 
@@ -126,7 +126,7 @@ SillyTavern/public/scripts/extensions/third-party/reasoning-content-extractor
 
 #### 标签名
 
-默认模式。填写一个标签名即可。
+默认模式。可以填写一个或多个标签名。
 
 默认标签名：
 
@@ -146,6 +146,22 @@ content
 <context>...</context>
 ```
 
+如果需要同时提取多个标签，可以用逗号或换行分隔：
+
+```text
+content, context, response
+```
+
+或：
+
+```text
+content
+context
+response
+```
+
+扩展会按这些标签在推理块中的出现顺序全部提取，并用空行合并到正文中。
+
 #### 自定义正则
 
 高级模式。适合需要更复杂匹配规则的用户。
@@ -157,6 +173,8 @@ content
 ```
 
 扩展会优先使用第一个捕获组作为提取内容。如果没有捕获组，则使用完整匹配。
+
+如果正则标志中包含 `g`，扩展会提取所有匹配项；否则只提取第一个匹配项。
 
 ## 手动修复
 
@@ -221,6 +239,31 @@ context
 
 ```text
 这是正文。
+```
+
+### 示例四：同时提取多个标签
+
+在设置中将“标签名”填写为：
+
+```text
+content, context
+```
+
+推理块：
+
+```html
+分析内容……
+
+<context>这是上下文补充。</context>
+<content>这是应该显示的正文。</content>
+```
+
+默认提取到正文：
+
+```html
+<context>这是上下文补充。</context>
+
+<content>这是应该显示的正文。</content>
 ```
 
 ## 常见问题
