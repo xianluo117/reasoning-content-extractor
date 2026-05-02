@@ -40,7 +40,8 @@
 
             <div id="rce_tag_settings">
                 <label for="rce_tag_name">标签名</label>
-                <input id="rce_tag_name" class="text_pole" type="text" placeholder="content" />
+                <textarea id="rce_tag_name" class="text_pole textarea_compact" rows="2" placeholder="content, context"></textarea>
+                <small>可填写多个标签名，用逗号或换行分隔。会按推理块中的出现顺序全部提取。</small>
             </div>
 
             <div id="rce_regex_settings">
@@ -48,7 +49,7 @@
                 <textarea id="rce_regex" class="text_pole textarea_compact" rows="3" placeholder="<content\\b[^>]*>([\\s\\S]*?)<\\/content>"></textarea>
                 <label for="rce_regex_flags">正则标志</label>
                 <input id="rce_regex_flags" class="text_pole" type="text" placeholder="i" />
-                <small>优先使用第一个捕获组作为提取内容；如果没有捕获组，则使用完整匹配。</small>
+                <small>优先使用第一个捕获组作为提取内容；如果没有捕获组，则使用完整匹配。加入 g 标志时会提取所有匹配。</small>
             </div>
 
             <div class="flex-container flexGap5 rce_controls">
